@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/correlation.js"></script>
+    <script type="text/javascript" src="js/pcd.js"></script>
+    <script type="text/javascript" src="js/pca.js"></script>
+    <script type="text/javascript" src="js/mds.js"></script>
+    <script type="text/javascript" src="js/scatter.js"></script>
+    <script type="text/javascript" src="js/biplot.js"></script>
+    <script type="text/javascript" src="js/mds_corr.js"></script>
+    <script type="text/javascript" src="js/site.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+  <body>
+    <div id="title">Champion's League Football Stats</div>
+    <div id="main">
+      <div id="page-choose">
+        <button id="corr-but" onclick="handleGraph('corr-but')">
+          Correlation Matrix
+        </button>
+        <button id="scatter-but" onclick="handleGraph('scatter-but')">
+          Scatter Plot Matrix
+        </button>
+        <button id="pcd-but" onclick="handleGraph('pcd-but')">
+          Parallel Coordinate Display
+        </button>
+        <button id="pca-but" onclick="handleGraph('pca-but')">
+          PCA Plot
+        </button>
+        <button id="biplot-but" onclick="handleGraph('biplot-but')">
+          Biplot
+        </button>
+        <button id="mds-but" onclick="handleGraph('mds-but')">
+          MDS (Data)
+        </button>
+        <button id="mds1-but" onclick="handleGraph('mds1-but')">
+          MDS (Attributes)
+        </button>
+      </div>
+      <div id="graphs">
+      <div class="graph" id="correlation-data"></div>
+      <div class="graph" id="correlation-matrix"></div>
+      <div class="graph" id="pcd"></div>
+      <div id="pca-container">
+        <div class="graph" id="pca"></div>
+        <div class="graph" id="scree"></div>
+      </div>
+      <div class="graph" id="mds"></div>
+      <div class="graph" id="scatter-5"></div>
+      <div class="graph" id="biplot"></div>
+      <div class="graph" id="mds-corr"></div>
+    </div>
+    </div>
+    
+      <script>
+      fetch("data/correlation.csv")
+        .then((response) => response.text())
+        .then((data) => {
+          fetch("data/summed_correlation.csv")
+          .then((response) =>response.text())
+          .then((data1) =>{
+              var d1 = parseCSVForCorrSum(data1);
+              var res = parseCSV(data)
+              plotCorrelationMatrix(res, d1)
+          })
+        });
+    </script>
+
+    <script>
+      fetch("data/pcd_data.csv")
+        .then((response) => response.text())
+        .then((data) => {
+          var d = parseCSVForPCD(data);
+          plotPCD(d);
+        });
+    </script>
+    <script>
+      fetch("data/pca_full.csv")
+        .then((response) => response.text())
+        .then((data) => {
+          var d = parseCSVForScree(data);
+          plotScree(d);
+        });
+    </script>
+    <script>
+      fetch("data/pca.csv")
+        .then((response) => response.text())
+        .then((data) => {
+          var d = parseCSVForPCA(data);
+          plotPCA(d);
+        });
+    </script>
+    <script>
+      fetch("data/mds_eucl.csv")
+        .then((response) => response.text())
+        .then((data) => {
+          var d = parseCSVForMDS(data);
+          plotMDSEucl(d);
+        });
+    </script>
+    <script>
+      fetch("data/data.csv")
+        .then((response) => response.text())
+        .then((data) => {
+          var  d = parseCSVForDataScatter(data);
+          var headers = parseHeaders(data);
+          console.log(d)
+          fetch("data/summed_correlation.csv")
+          .then((response) =>response.text())
+          .then((data1) =>{
+              var d1 = parseCSVForCorrelationSum(data1, d, headers);
+              createScatter5x5(d, d1)
+          })
+        });
+    </script>
+    <script>
+      fetch("data/pca.csv").then((response) =>response.text()).then((data)=>{
+        var  d = parseCSVForPCA(data);
+        fetch("data/biplot.csv")
+        .then((response) => response.text())
+        .then((data1) => {
+          var  d1 = parseCSVForBiplot(data1);
+          graphBiplot(d, d1);
+        });
+      })
+    </script>
+    <script>
+      fetch("data/mds_corr.csv")
+      .then((response)=>response.text())
+      .then((data)=>{
+        var data1 = parseCSVForMDSCorr(data); 
+        plotMDSCorr(data1)})
+    </script>
+  </body>
+</html>

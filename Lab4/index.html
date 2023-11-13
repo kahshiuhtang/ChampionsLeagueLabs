@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/correlation.js"></script>
+    <script type="text/javascript" src="js/pcd.js"></script>
+    <script type="text/javascript" src="js/pca.js"></script>
+    <script type="text/javascript" src="js/mds.js"></script>
+    <script type="text/javascript" src="js/scatter.js"></script>
+    <script type="text/javascript" src="js/biplot.js"></script>
+    <script type="text/javascript" src="js/mds_corr.js"></script>
+    <script type="text/javascript" src="js/site.js"></script>
+    <script type="text/javascript" src="js/helper.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+  <body>
+    <div>
+      <input id="color-map" value=""/>
+    </div>
+    <div id="title">Champion's League Football Stats</div>
+    <div id="main">
+      <div id="page-choose">
+        <button id="corr-but" onclick="handleGraph('corr-but')">
+          Correlation Matrix
+        </button>
+        <button id="scatter-but" onclick="handleGraph('scatter-but')">
+          Scatter Plot Matrix
+        </button>
+        <button id="pcd-but" onclick="handleGraph('pcd-but')">
+          Parallel Coordinate Display
+        </button>
+        <button id="pca-but" onclick="handleGraph('pca-but')">
+          PCA Plot
+        </button>
+        <button id="biplot-but" onclick="handleGraph('biplot-but')">
+          Biplot
+        </button>
+        <button id="mds-but" onclick="handleGraph('mds-but')">
+          MDS (Data)
+        </button>
+        <button id="mds1-but" onclick="handleGraph('mds1-but')">
+          MDS (Attributes)
+        </button>
+      </div>
+      <div id="control-panel">
+        <div class="cont">
+          <label class="header" for="variable">Graph Variable: </label>
+        </div>
+        <div id="select-div" class="cont">
+          <select name="selected-variable" id="variable-select">
+            <option value="Posession">Poessession</option>
+            <option value="GoalsAgainstPer90">GoalsAgainstPer90</option>
+            <option value="GoalieSave%">
+              GoalieSave%
+            </option>
+            <option value="TotalWins">TotalWins</option>
+            <option value="GoalieLaunchedComp%">
+              GoalieLaunchedComp%
+            </option>
+            <option value="GoaliePassesLaunch%">GoaliePassesLaunch%</option>
+            <option value="StandardSh/90%">StandardSh/90</option>
+            <option value="StandardSoT/90%">StandardSoT/90</option>
+            <option value="TotalPassCmp%">TotalPassCmp%</option>
+            <option value="ChallengesTkl%">ChallengesTkl%</option>
+            <option value="Take-OnsSucc%">
+              Take-OnsSucc%
+            </option>
+            <option value="TeamSuccess(xG)xG+/-90">TeamSuccess(xG)xG+/-90</option>
+          </select>
+          <div class="cont">
+            <button id="show-histogram" onclick="showStartHistogram()">Show Graph</button>
+          </div>
+      </div>  
+      <div id="starting-bar"></div>
+      <div id="graphs">
+      <div class="graph" id="correlation-data"></div>
+      <div class="graph" id="correlation-matrix"></div>
+      <div class="graph" id="pcd"></div>
+      <div id="pca-container">
+        <div class="graph" id="pca"></div>
+        <div class="graph" id="scree"></div>
+      </div>
+      <div class="graph" id="mds"></div>
+      <div class="graph" id="biplot"></div>
+      <div class="graph" id="mds-corr"></div>
+    </div>
+    </div>
+    
+      <script>
+      fetch("data/correlation.csv")
+        .then((response) => response.text())
+        .then((data) => {
+          fetch("data/summed_correlation.csv")
+          .then((response) =>response.text())
+          .then((data1) =>{
+              var d1 = parseCSVForCorrSum(data1);
+              var res = parseCSV(data)
+              plotCorrelationMatrix(res, d1)
+          })
+        });
+    </script>
+
+    <script>
+      fetch("data/pcd_data.csv")
+        .then((response) => response.text())
+        .then((data) => {
+          var d = parseCSVForPCD(data);
+          plotPCD(d);
+        });
+    </script>
+    <script>
+      fetch("data/pca_full.csv")
+        .then((response) => response.text())
+        .then((data) => {
+          var d = parseCSVForScree(data);
+          plotScree(d);
+        });
+    </script>
+    <script>
+      fetch("data/pca.csv")
+        .then((response) => response.text())
+        .then((data) => {
+          var d = parseCSVForPCA(data);
+          plotPCA(d);
+        });
+    </script>
+    <script>
+      fetch("data/mds_eucl.csv")
+        .then((response) => response.text())
+        .then((data) => {
+          var d = parseCSVForMDS(data);
+          plotMDSEucl(d);
+        });
+    </script>
+    <script>
+      fetch("data/pca.csv").then((response) =>response.text()).then((data)=>{
+        var  d = parseCSVForPCA(data);
+        fetch("data/biplot.csv")
+        .then((response) => response.text())
+        .then((data1) => {
+          var  d1 = parseCSVForBiplot(data1);
+          graphBiplot(d, d1);
+        });
+      })
+    </script>
+    <script>
+      fetch("data/mds_corr.csv")
+      .then((response)=>response.text())
+      .then((data)=>{
+        var data1 = parseCSVForMDSCorr(data); 
+        plotMDSCorr(data1)})
+    </script>
+    <script>
+      var map = {};
+      function showStartHistogram(){
+        fetch("data/data.csv")
+        .then((response) => response.text())
+        .then((csvData) => {
+          if (document.getElementById("data-string")) {
+            document.getElementById("data-string").value = JSON.stringify(
+              parseBasicCSV(csvData)
+            );
+          }
+          createMainHistogram(parseBasicCSV(csvData))
+        })
+        .catch((error) => {
+          console.error("Error preloading the CSV file:", error);
+        });
+      }
+
+    </script>
+  </body>
+</html>

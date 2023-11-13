@@ -1,0 +1,130 @@
+<html>
+  <head>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="styles.css" />
+    <script type="text/javascript" src="index.js"></script>
+    <script src="https://d3js.org/d3.v7.js"></script>
+  </head>
+  <body>
+    <input id="data-string" style="display:none" value="""/>
+    <input id="x-var" style="display: none" value="" />
+    <input id="y-var" style="display: none" value="" />
+    <div id="title">Champion's League Football Stats</div>
+    <div id="main">
+      <div id="control-bar">
+        <div id="section-header">Graph Selector</div>
+        <div id="control-body">
+          <div id="drop-down-container" class="whole">
+            <div id="dropdown">
+              <div class="cont">
+                <label class="header" for="variable">Select Variable: </label>
+              </div>
+              <div id="select-div" class="cont">
+                <select name="selected-variable" id="variable-select">
+                  ShortCmp%,MediumCmp%,LongCmp%,PassTypesTB,PassTypesSw,SCA90,Tkl+Int,TouchesDef3rd,TouchesMid3rd,TouchesAtt3rd
+                  <option value="Year">Year</option>
+                  <option value="Age">Age</option>
+                  <option value="SweeperAvgDist">
+                    Sweeper Average Distance
+                  </option>
+                  <option value="Per90MinutesnpxG">Per 90 Minute npxG</option>
+                  <option value="LongCmp%">
+                    Long Pass Completion Percentage
+                  </option>
+                  <option value="StandardSoT/90">Standard SoT/90</option>
+                  <option value="PassTypesTB">Through Ball Passes</option>
+                  <option value="PassTypesSw">Switch Passes</option>
+                  <option value="SCA90">Shot Creating Actions per 90</option>
+                  <option value="Tkl+Int">Tackles + Interceptions</option>
+                  <option value="TouchesDef3rd">
+                    Touches in Defending 3rd
+                  </option>
+                </select>
+              </div>
+              <div id="selected-x-var" class="cont">
+                Selected X-Variable: None
+              </div>
+              <div id="selected-y-var" class="cont">
+                Selected Y-Variable: None
+              </div>
+            </div>
+          </div>
+          <div id="axis-selector" class="whole">
+            <div class="header">Select Variable Axis</div>
+            <div id="radio-x-or-y" class="cont">
+              <label class="rad">
+                <input id="x" name="var" type="radio" value="x" checked />
+                X-axis
+              </label>
+              <label class="rad">
+                <input id="y" name="var" type="radio" value="y" /> Y-axis
+              </label>
+            </div>
+            <div class="cont">
+              <button id="set-var" onclick="handleSetVariable();">
+                Set Variable
+              </button>
+            </div>
+          </div>
+          <div id="graph-selector" class="whole">
+            <div class="header">Select Type of Graph</div>
+            <div id="chart-select" class="cont">
+              <label>
+                <input
+                  id="scatter"
+                  type="radio"
+                  name="graph-type"
+                  value="scatter"
+                />
+                Scatter
+              </label>
+              <label>
+                <input
+                  id="bar"
+                  type="radio"
+                  name="graph-type"
+                  value="bar"
+                />Histogram/Bar
+              </label>
+              <label>
+                <input id="pie" type="radio" name="graph-type" value="pie" />
+                Pie
+              </label>
+            </div>
+            <div class="cont">
+              <button id="set-axis-and-variable" onclick="createGraph();">
+                Create Graph
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="chart-div">
+        <div id="bar-chart" class="chart"></div>
+        <div id="pie-chart" class="chart"></div>
+        <div id="scatter-plot" class="chart"></div>
+      </div>
+    </div>
+
+    <script>
+      fetch("table1.csv")
+        .then((response) => response.text())
+        .then((csvData) => {
+          // Once the CSV file is loaded, you can process it or store it as needed
+          if (document.getElementById("data-string")) {
+            document.getElementById("data-string").value = JSON.stringify(
+              parseCSV(csvData)
+            );
+          }
+        })
+        .catch((error) => {
+          console.error("Error preloading the CSV file:", error);
+        });
+    </script>
+  </body>
+</html>
