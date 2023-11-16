@@ -20,7 +20,7 @@ function parseBasicCSV(csvString) {
   }
   return result;
 }
-function createMainHistogram(allData) {
+function createMainHistogram(allData, clickHandler) {
   document.getElementById("starting-bar").innerHTML = "";
   var varName = document.getElementById("variable-select").value;
   var data = [];
@@ -28,11 +28,11 @@ function createMainHistogram(allData) {
     data.push(parseFloat(allData[i][varName]));
   }
   const dim = {
-    width: 540,
+    width: 740,
     height: 540,
     top: 60,
     bottom: 30,
-    left: 20,
+    left: 40,
     right: 20,
   };
   var svg = d3
@@ -55,6 +55,7 @@ function createMainHistogram(allData) {
     .append("g")
     .attr("transform", "translate(0," + dim.height + ")")
     .call(d3.axisBottom(x));
+
   var histogram = d3
     .histogram()
     .value(function (d) {
@@ -64,7 +65,10 @@ function createMainHistogram(allData) {
     .thresholds(x.ticks(8));
 
   var bins = histogram(data);
-  var y = d3.scaleLinear().range([dim.height, 0]);
+  var difference  = x(2) - x(1);
+  console.log(difference)
+  
+  var y = d3.scaleLinear( ).range([dim.height, 0]);
   y.domain([
     0,
     d3.max(bins, function (d) {
@@ -80,7 +84,6 @@ function createMainHistogram(allData) {
     .append("rect")
     .attr("x", 1)
     .attr("transform", function (d) {
-      console.log(y(d.length));
       return "translate(" + x(d.x0) + "," + y(d.length) + ")";
     })
     .attr("width", function (d) {
@@ -90,7 +93,15 @@ function createMainHistogram(allData) {
       return dim.height - y(d.length);
     }).
     on("click", function(d) {
-        console.log(d)
+      var min = 10000000;
+      var max = -1111111;
+      for(var i = 0; i < d.length; i++){
+        if(d[i] < min) min = d[i];
+        if(d[i] > max) max = d[i];
+      }
+      var color = clickHandler(min, max);
+
+      d3.select(this).style("fill", color);
     })
-    .style("fill", "#69b3a2");
+    .style("fill", "#0c1821");
 }

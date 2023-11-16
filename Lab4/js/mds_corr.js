@@ -7,7 +7,6 @@ function parseCSVForMDSCorr(csvString) {
     temp["y"] = parseFloat(data[i + 1]);
     ans.push(temp);
   }
-  console.log(ans);
   return ans;
 }
 function plotMDSCorr(data) {

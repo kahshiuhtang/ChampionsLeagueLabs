@@ -1,8 +1,3 @@
-function clearGraphs() {
-  document.getElementById("bar-chart").innerHTML = "";
-  document.getElementById("pie-chart").innerHTML = "";
-  document.getElementById("scatter-plot").innerHTML = "";
-}
 
 function parseCSV(csvString) {
   const lines = csvString.split("\n");

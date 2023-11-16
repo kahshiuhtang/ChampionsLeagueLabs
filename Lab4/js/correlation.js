@@ -30,7 +30,6 @@ function parseCSVForCorrSum(csvString) {
   return nums;
 }
 function plotCorrelationMatrix(data, sums) {
-  console.log(sums);
   var new_data = [];
   var headers = [];
   var length = data.length;
@@ -174,7 +173,6 @@ function plotCorrelationMatrix(data, sums) {
     .attr("x", (d, idx) => idx * 86 - xSpace / 17)
     .attr("y", (d) => height + margin.top - 20)
     .text(function (d) {
-      console.log(d);
       return d.toFixed(3);
     })
     .attr("font-size", 9);

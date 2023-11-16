@@ -17,12 +17,11 @@ function parseCSVForMDS(csvString) {
   }
   return result;
 }
-function plotMDSEucl(data) {
-  createScatterMDSEucl(data);
+function plotMDSEucl(data, cluster_data) {
+  createScatterMDSEucl(data, cluster_data);
 }
 
-function createScatterMDSEucl(data) {
-  console.log(data);
+function createScatterMDSEucl(data, cluster_data ) {
   const dim = {
     width: 540 - 80 - 40,
     height: 540 - 60 - 30,
@@ -31,6 +30,11 @@ function createScatterMDSEucl(data) {
     bottom: 30,
     left: 80,
   };
+  for(var i = 0; i < data.length; i++){
+    data[i]["cluster"] = cluster_data[i];
+  }
+  
+  var colors = ["#001219", "#94d2bd", "#e9d8a6", "#ee9b00", "#e56b6f", "#57cc99", "#967aa1", "#4393c3", "#2166ac"]
   const svg = d3
     .select("#mds")
     .append("svg")
@@ -62,6 +66,9 @@ function createScatterMDSEucl(data) {
     .data(data)
     .enter()
     .append("circle")
+    .style("fill", function(d, i){
+      return colors[d.cluster];
+    })
     .attr("cx", function (d) {
       return xScale(parseFloat(d.x));
     })
@@ -69,7 +76,7 @@ function createScatterMDSEucl(data) {
       return yScale(parseFloat(d.y));
     })
     .attr("r", 4)
-    .style("fill", "#000080");
+    ;
   svg
     .append("g")
     .attr("transform", "translate(0," + yScale(0) + ")")
