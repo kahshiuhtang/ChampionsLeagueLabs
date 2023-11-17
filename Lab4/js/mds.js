@@ -34,7 +34,7 @@ function createScatterMDSEucl(data, cluster_data ) {
     data[i]["cluster"] = cluster_data[i];
   }
   
-  var colors = ["#001219", "#94d2bd", "#e9d8a6", "#ee9b00", "#e56b6f", "#57cc99", "#967aa1", "#4393c3", "#2166ac"]
+  var colors = ["#001219", "#94d2bd", "#e9d8a6", "#ee9b00", "#e56b6f", "#57cc99", "#967aa1", "#4393c3", "#2166ac", "#54AD56"]
   const svg = d3
     .select("#mds")
     .append("svg")
@@ -93,10 +93,10 @@ function createScatterMDSEucl(data, cluster_data ) {
     .attr("text-anchor", "middle")
     .attr("transform", "rotate(-90)")
     .attr("y", -dim.left + 20)
-    .attr("x", -dim.top - dim.height / 2 + 20)
+    .attr("x", -dim.top - dim.height / 2 + 60 )
     .text(y_label)
     .style("font-size", 12)
-    .style("font-weight", "bold");
+    .style("font-weight", "bold").style("fill", "white");;
   svg
     .append("text")
     .attr("text-anchor", "middle")
@@ -104,7 +104,7 @@ function createScatterMDSEucl(data, cluster_data ) {
     .attr("y", dim.height + dim.bottom)
     .text(x_label)
     .style("font-size", 12)
-    .style("font-weight", "bold");
+    .style("font-weight", "bold").style("fill", "white");;
 
   svg
     .append("text")
@@ -113,5 +113,5 @@ function createScatterMDSEucl(data, cluster_data ) {
     .attr("y", -10)
     .text("MDS Data Scatter")
     .style("font-size", 14)
-    .style("font-weight", "bold");
+    .style("font-weight", "bold").style("fill", "white");;
 }

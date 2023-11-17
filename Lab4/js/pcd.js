@@ -82,7 +82,7 @@ function plotPCD(data, cluster_data) {
   for(var i = 0; i < data.length; i++){
     data[i]["cluster"] = cluster_data[i];
   }
-  var colors = ["#001219", "#94d2bd", "#e9d8a6", "#ee9b00", "#e56b6f", "#57cc99", "#967aa1", "#4393c3", "#2166ac"]
+  var colors = ["#001219", "#94d2bd", "#e9d8a6", "#ee9b00", "#e56b6f", "#57cc99", "#967aa1", "#4393c3", "#2166ac","#54AD56"]
   
   x = d3.scalePoint().range([0, width]).padding(1).domain(dataFieldNames);
 
@@ -131,5 +131,6 @@ function plotPCD(data, cluster_data) {
     .attr("y", height + margin.top - 20)
     .text("Parallel Coordinate Display")
     .style("font-size", "20px")
-    .style("font-weight", "bold");
+    .style("font-weight", "bold")
+    .style("fill", "white");
 }

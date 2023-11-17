@@ -20,6 +20,35 @@ function parseBasicCSV(csvString) {
   }
   return result;
 }
+function parseLabel(label){
+  if(label == "Year"){
+    return " (Year)"
+  }else if(label == "Posession"){
+    return label  + " (%)"
+  }else if(label == "GoalsAgainstPer90"){
+    return label  + " (Goals)"
+  }else if(label == "GoalieSave%"){
+    return label  + " (%)"
+  }else if(label == "TotalWins"){
+    return label  + " (Wins)"
+  }else if(label == "GoalieLaunchedComp%"){
+    return label  + " (%)"
+  }else if(label == "GoaliePassesLaunch%"){
+    return label  + " (%)"
+  }else if(label == "StandardSh/90"){
+    return label  + " (Shots)"
+  }else if(label == "StandardSoT/90"){
+    return label  + " (Shots)"
+  }else if(label == "TotalPassCmp%"){
+    return label  + " (%)"
+  }else if(label == "ChallengesTkl%"){
+    return label  + " (%)"
+  }else if(label == "Take-OnsSucc%"){
+    return label  + " (%)"
+  }else if(label == "TeamSuccess(xG)xG+/-90"){
+    return label  + " (xG +/- 90)"
+  }
+}
 function createMainHistogram(allData, clickHandler) {
   document.getElementById("starting-bar").innerHTML = "";
   var varName = document.getElementById("variable-select").value;
@@ -31,7 +60,7 @@ function createMainHistogram(allData, clickHandler) {
     width: 740,
     height: 540,
     top: 60,
-    bottom: 30,
+    bottom: 80,
     left: 40,
     right: 20,
   };
@@ -45,9 +74,11 @@ function createMainHistogram(allData, clickHandler) {
   var x = d3
     .scaleLinear()
     .domain([
-      0,
+      d3.min(data, function (d) {
+        return d * 0.8;
+      }),
       d3.max(data, function (d) {
-        return d;
+        return d *1.1;
       }),
     ])
     .range([0, dim.width]);
@@ -62,7 +93,7 @@ function createMainHistogram(allData, clickHandler) {
       return d;
     })
     .domain(x.domain())
-    .thresholds(x.ticks(8));
+    .thresholds(x.ticks(7));
 
   var bins = histogram(data);
   var difference  = x(2) - x(1);
@@ -104,4 +135,13 @@ function createMainHistogram(allData, clickHandler) {
       d3.select(this).style("fill", color);
     })
     .style("fill", "#0c1821");
+
+    svg
+      .append("text")
+      .attr("text-anchor", "middle")
+      .attr("x", dim.width / 2)
+      .attr("y", dim.height + dim.bottom -  25)
+      .style("fill", "white")
+      .text(parseLabel(document.getElementById("variable-select").value))
+      .style("font-size", 14);
 }

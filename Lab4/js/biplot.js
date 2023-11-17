@@ -39,7 +39,7 @@ function graphBiplot(data, lineData, cluster_data) {
     data[i]["cluster"] = cluster_data[i];
   }
   
-  var colors = ["#001219", "#94d2bd", "#e9d8a6", "#ee9b00", "#e56b6f", "#57cc99", "#967aa1", "#4393c3", "#2166ac"]
+  var colors = ["#001219", "#94d2bd", "#e9d8a6", "#ee9b00", "#e56b6f", "#57cc99", "#967aa1", "#4393c3", "#2166ac", "#54AD56"]
     
   svg
     .append("g")
@@ -75,7 +75,7 @@ function graphBiplot(data, lineData, cluster_data) {
     .attr("x", -yScale(0))
     .text(y_label)
     .style("font-size", 12)
-    .style("font-weight", "bold");
+    .style("font-weight", "bold").style("fill", "white");
   svg
     .append("text")
     .attr("text-anchor", "middle")
@@ -83,7 +83,7 @@ function graphBiplot(data, lineData, cluster_data) {
     .attr("y", dim.height + dim.bottom)
     .text(x_label)
     .style("font-size", 12)
-    .style("font-weight", "bold");
+    .style("font-weight", "bold").style("fill", "white");
 
   svg
     .append("text")
@@ -92,7 +92,7 @@ function graphBiplot(data, lineData, cluster_data) {
     .attr("y", -10)
     .text("Biplot with PC1 and PC2")
     .style("font-size", "20px")
-    .style("font-weight", "bold");
+    .style("font-weight", "bold").style("fill", "white");;
   lineData.forEach(function (line) {
     svg
       .append("line")
@@ -102,22 +102,7 @@ function graphBiplot(data, lineData, cluster_data) {
       .attr("y1", yScale(0))
       .attr("x2", xScale(line.x))
       .attr("y2", yScale(line.y));
-/*
-      ,PC1,PC2
-Year,0.013774492596563246,0.5758430841217149
-Posession,0.3787455858893921,0.0025023633900104203
-GoalsAgainstPer90,-0.3156135403461997,-0.009127385373558495
-GoalieSave%,0.13853093068965186,-0.0336729996553402
-TotalWins,0.3166292257932884,-0.0003690813461093203
-GoalieLaunchedComp%,0.09098903672811912,-0.20963353963804415
-GoaliePassesLaunch%,-0.30933518078084665,-0.08424855007435816
-StandardSh/90,0.3583901917653463,-0.038089281303056624
-StandardSoT/90,0.35536782447284104,-0.0035926343228127947
-TotalPassCmp%,0.3305969941390473,0.011082797642609485
-ChallengesTkl%,0.0943443020218222,0.5079685365201552
-Take-OnsSucc%,0.08681832415170904,-0.5970837079299748
-TeamSuccess(xG)xG+/-90,0.39099300751431215,0.0030996903522004246
-*/
+
     svg
       .append("text")
       .attr("x", function () {
