@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/correlation.js"></script>
+    <script type="text/javascript" src="js/pcd.js"></script>
+    <script type="text/javascript" src="js/pca.js"></script>
+    <script type="text/javascript" src="js/mds.js"></script>
+    <script type="text/javascript" src="js/scatter.js"></script>
+    <script type="text/javascript" src="js/biplot.js"></script>
+    <script type="text/javascript" src="js/mds_corr.js"></script>
+    <script type="text/javascript" src="js/site.js"></script>
+    <script type="text/javascript" src="js/helper.js"></script>
+    <script type="text/javascript" src="js/default_cluster.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+  <body>
+    <div>
+      <input id="color-map" value=""/>
+    </div>
+    <div id="title">Champion's League Football Stats</div>
+    <div id="main">
+      <div id="page-choose">
+        <button id="choose-clusters-but" onclick="handleChoose()">
+          Choose Clusters
+        </button>
+        <button id="default-clusters-but" onclick="handlePreClusteredData()">
+          View K-Means Clustered Data
+        </button>
+      </div>
+      <div id="control-panel">
+        <div class="cont">
+          <label class="header" for="variable">Graph Variable: </label>
+        </div>
+        <div id="select-div" class="cont">
+          <select name="selected-variable" id="variable-select">
+            <option value="Posession">Poessession</option>
+            <option value="GoalsAgainstPer90">GoalsAgainstPer90</option>
+            <option value="GoalieSave%">
+              GoalieSave%
+            </option>
+            <option value="TotalWins">TotalWins</option>
+            <option value="GoalieLaunchedComp%">
+              GoalieLaunchedComp%
+            </option>
+            <option value="GoaliePassesLaunch%">GoaliePassesLaunch%</option>
+            <option value="StandardSh/90">StandardSh/90</option>
+            <option value="StandardSoT/90">StandardSoT/90</option>
+            <option value="TotalPassCmp%">TotalPassCmp%</option>
+            <option value="ChallengesTkl%">ChallengesTkl%</option>
+            <option value="Take-OnsSucc%">
+              Take-OnsSucc%
+            </option>
+            <option value="TeamSuccess(xG)xG+/-90">TeamSuccess(xG)xG+/-90</option>
+          </select>
+          <div class="cont">
+            <button id="show-histogram" onclick="showStartHistogram()">Show Graph</button>
+          </div>
+      </div>  
+      <div id="starting-bar"></div>
+      <div id="graphs">
+      <div class="graph" id="pcd"></div>
+      <div id="mds-biplot-display">
+        <div class="graph" id="mds"></div>
+        <div class="graph" id="biplot"></div>
+      </div>
+    </div>
+    </div>
+    <script>
+      var biplot_data;
+      var pca_data;
+      var mds_data;
+      var pcd_data;
+      var cluster_data = [];
+      fetch("data/pca.csv").then((response) =>response.text()).then((data)=>{
+        pca_data = parseCSVForPCA(data);
+        fetch("data/biplot.csv")
+        .then((response) => response.text())
+        .then((data1) => {
+          biplot_data = parseCSVForBiplot(data1);
+        });
+      })
+      fetch("data/mds_eucl.csv")
+        .then((response) => response.text())
+        .then((data) => {
+          mds_data = parseCSVForMDS(data);
+        });
+      fetch("data/pcd_data.csv")
+      .then((response) => response.text())
+      .then((data) => {
+        pcd_data= parseCSVForPCD(data);
+      });
+      for(var i = 0; i < 384; i++){
+            cluster_data.push(0);
+      }
+      function handleChoose(cluster_update){
+        document.getElementById("pcd").style.display = "block";
+        document.getElementById("mds").style.display = "block";
+        document.getElementById("biplot").style.display = "block";
+
+        document.getElementById("pcd").innerHTML = "";
+        document.getElementById("mds").innerHTML = "";
+        document.getElementById("biplot").innerHTML = "";
+        if(cluster_update != null){
+          cluster_data = cluster_update;
+        }
+        console.log(cluster_data)
+        graphBiplot(pca_data, biplot_data, cluster_data);
+        plotMDSEucl(mds_data, cluster_data);
+        plotPCD(pcd_data, cluster_data);
+      }
+    </script>
+    <script>
+      var biplot_data;
+      var pca_data;
+      var mds_data;
+      var pcd_data;
+      var current_cluster_status;
+      fetch("data/pca.csv").then((response) =>response.text()).then((data)=>{
+        pca_data = parseCSVForPCA(data);
+        fetch("data/biplot.csv")
+        .then((response) => response.text())
+        .then((data1) => {
+          biplot_data = parseCSVForBiplot(data1);
+        });
+      })
+      fetch("data/mds_eucl.csv")
+        .then((response) => response.text())
+        .then((data) => {
+          mds_data = parseCSVForMDS(data);
+        });
+      fetch("data/pcd_data.csv")
+      .then((response) => response.text())
+      .then((data) => {
+        pcd_data= parseCSVForPCD(data);
+      });
+      fetch("data/clusters.csv")
+      .then((response) => response.text())
+      .then((data) => {
+        current_cluster_status = parseCluster(data);
+      });
+      function handlePreClusteredData(){
+        document.getElementById("pcd").style.display = "block";
+        document.getElementById("mds").style.display = "block";
+        document.getElementById("biplot").style.display = "block";
+
+        document.getElementById("starting-bar").innerHTML = "";
+        document.getElementById("pcd").innerHTML = "";
+        document.getElementById("mds").innerHTML = "";
+        document.getElementById("biplot").innerHTML = "";
+        graphBiplot(pca_data, biplot_data, current_cluster_status);
+        plotMDSEucl(mds_data, current_cluster_status);
+        plotPCD(pcd_data, current_cluster_status);
+      }
+    </script>
+    <script>
+      var parsedData;
+      var map = {};
+      var usedIndexes = new Set();
+      function clearOutClustering(){
+        map = {};
+        usedIndexes = new Set();
+        var ans = [];
+        for(var i = 0; i < parsedData.length; i++){
+          parsedData[i].cluster = 0;
+          ans.push(parsedData[i].cluster)
+        }
+        handleChoose(ans);
+      }
+      function handleBarClick(min, max){
+        var field = document.getElementById("variable-select").value;
+        var reset = false;
+        var removeThisIndex = -1;
+        if((min + "," + max) in map){
+          reset = true;
+          usedIndexes.delete(map[min + "," + max]);
+        }
+        var ans = [];
+        var nextFreeIndex = - 1;
+        for(var i = 1; ;i++){
+          if(usedIndexes.has(i) == false){
+            nextFreeIndex = i;
+            break;
+          }
+        }
+        for(var i = 0; i < parsedData.length; i++){
+          if(parsedData[i][field] <= max && parsedData[i][field] >= min){
+            if(reset == false){
+              parsedData[i].cluster = nextFreeIndex;
+            }else{
+              parsedData[i].cluster = 0;
+            }
+          }
+          ans.push(parsedData[i].cluster)
+        }
+        if(reset == true){
+          delete map[min + "," + max];
+        }else{
+          map[min + "," + max] = nextFreeIndex; 
+          usedIndexes.add(nextFreeIndex);
+        }
+        var colors = ["#001219", "#94d2bd", "#e9d8a6", "#ee9b00", "#e56b6f", "#57cc99", "#967aa1", "#4393c3", "#2166ac", "#54AD56"]
+        handleChoose(ans)
+        return reset == true ? "#0c1821" : colors[nextFreeIndex];
+      }
+      function showStartHistogram(){
+        fetch("data/data.csv")
+        .then((response) => response.text())
+        .then((csvData) => {
+          parsedData = parseBasicCSV(csvData);
+          clearOutClustering();
+          createMainHistogram(parseBasicCSV(csvData), handleBarClick)
+          for(var i = 0; i < parsedData.length ; i++){
+            parsedData[i].cluster = 0;
+          }
+        })
+        .catch((error) => {
+          console.error("Error preloading the CSV file:", error);
+        });
+      }
+
+    </script>
+  </body>
+</html>

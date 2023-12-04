@@ -1,0 +1,127 @@
+body {
+  height: 160vh;
+  padding: 0;
+  margin: 0;
+}
+text {
+  color: white;
+}
+#title {
+  width: 100%;
+  height: 7%;
+  background-color: #037171;
+  color: white;
+  text-align: center;
+  font-size: 54px;
+  font-weight: bold;
+  padding-top: 12px;
+}
+#main {
+  width: 100%;
+  height: 250vh;
+  background-color: #8a817c;
+  font-size: 24px;
+}
+.graph {
+  display: none;
+}
+#graphs {
+  height: 100%;
+}
+#pca-container {
+  display: flex;
+}
+#pca,
+#scree {
+  flex: 1;
+  width: 50vw;
+}
+button {
+  background-color: #037171;
+  color: white;
+  text-align: center;
+  border-radius: 5px;
+}
+#title {
+  width: 100%;
+  height: 6%;
+  background-color: #037171;
+  color: white;
+  text-align: center;
+  font-size: 54px;
+  font-weight: bold;
+  padding-top: 12px;
+}
+#main {
+  width: 100%;
+  height: 100%;
+  background-color: #8a817c;
+  font-size: 24px;
+}
+#control-bar {
+  display: inline-block;
+  background-color: #f2b5d4;
+  margin-top: 5%;
+  margin-left: 5%;
+  width: 23%;
+}
+#chart-div {
+  display: inline-block;
+}
+.chart {
+  margin-left: 150px;
+  margin-top: 30px;
+}
+.header {
+  text-align: center;
+  font-size: 30px;
+  font-weight: bold;
+  color: white;
+}
+#section-header {
+  text-align: center;
+  font-size: 30px;
+  font-weight: bold;
+  background-color: #037171;
+  color: white;
+  padding-top: 10px;
+  padding-bottom: 5px;
+}
+#select-div {
+  padding-top: 10px;
+}
+.cont {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#chart-select > label {
+  padding-left: 15px;
+}
+.whole {
+  padding-top: 30px;
+}
+button {
+  background-color: #037171;
+  color: white;
+  border-radius: 10px;
+}
+#selected-x-var,
+#selected-y-var {
+  font-size: 14px;
+}
+.rad {
+  margin-left: 10px;
+}
+#mds-biplot-display > * {
+  float: left;
+}
+#starting-bar {
+  margin-left: 40px;
+}
+
+.selected {
+  opacity: 1 !important;
+  stroke: blue;
+  stroke-width: 1px;
+}
