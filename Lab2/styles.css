@@ -1,69 +1,70 @@
-#title{
-    width: 100%;
-    height: 11%;
-    background-color: #037171;
-    color: white;
-    text-align: center;
-    font-size: 54px;
-    font-weight: bold;
-    padding-top: 12px;
+#title {
+  width: 100%;
+  height: 6%;
+  background-color: #037171;
+  color: white;
+  text-align: center;
+  font-size: 54px;
+  font-weight: bold;
+  padding-top: 12px;
 }
-#main{
-    width: 100%;
-    height: 100%;
-    background-color: #ACD8AA;
-    font-size: 24px;
+#main {
+  width: 100%;
+  height: 100%;
+  background-color: #acd8aa;
+  font-size: 24px;
 }
-#control-bar{
-    display: inline-block;
-    background-color: #F2B5D4;
-    margin-top: 5%;
-    margin-left: 5%;
-    width: 23%;
+#control-bar {
+  display: inline-block;
+  background-color: #f2b5d4;
+  margin-top: 5%;
+  margin-left: 5%;
+  width: 23%;
 }
-#chart-div{
-    display: inline-block
+#chart-div {
+  display: inline-block;
 }
-.chart{
-    margin-left: 150px;
-    margin-top: 30px;
+.chart {
+  margin-left: 150px;
+  margin-top: 30px;
 }
-.header{
-    text-align: center;
-    font-size:30px;
-    font-weight: bold;
+.header {
+  text-align: center;
+  font-size: 30px;
+  font-weight: bold;
 }
-#section-header{
-    text-align: center;
-    font-size: 30px;
-    font-weight:bold;
-    background-color: #037171;
-    color: white;
-    padding-top: 10px;
-    padding-bottom: 5px;
+#section-header {
+  text-align: center;
+  font-size: 30px;
+  font-weight: bold;
+  background-color: #037171;
+  color: white;
+  padding-top: 10px;
+  padding-bottom: 5px;
 }
-#select-div{
-    padding-top: 10px;
+#select-div {
+  padding-top: 10px;
 }
-.cont{
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.cont {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-#chart-select > label{
-    padding-left: 15px;
+#chart-select > label {
+  padding-left: 15px;
 }
-.whole{
-    padding-top: 30px;
+.whole {
+  padding-top: 30px;
 }
-button{
-    background-color: #037171;
-    color: white;
-    border-radius: 10px;
+button {
+  background-color: #037171;
+  color: white;
+  border-radius: 10px;
 }
-#selected-x-var, #selected-y-var{
-    font-size: 14px;
+#selected-x-var,
+#selected-y-var {
+  font-size: 14px;
 }
-.rad{
-    margin-left: 10px;
+.rad {
+  margin-left: 10px;
 }

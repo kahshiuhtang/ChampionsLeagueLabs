@@ -26,7 +26,7 @@ function groupByCountry(data) {
   return data;
 }
 
-function drawEurope(fullData, geoData) {
+function drawEurope(fullData, geoData, handleClick) {
   // Setting up the svg element for D3 to draw in
   let width = 800,
     height = 600;
@@ -83,6 +83,11 @@ function drawEurope(fullData, geoData) {
           return colorRange(findObject(parsedData, short).count);
         }
         return "white";
+      })
+      .on("click", function (d) {
+        console.log(d.properties.name);
+        var short = convertToShort(d.properties.name);
+        handleClick(short);
       }); // Color uses to fill in the lines
   });
 }

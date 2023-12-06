@@ -1,4 +1,8 @@
-function createScatter(data, varX, varY, plotID) {
+function createScatter(data, varX, varY, plotID, keys) {
+  if (keys == null) {
+    keys = new Set();
+  }
+  $(plotID).html("");
   const dim = {
     width: 540 - 80 - 40,
     height: 540 - 60 - 30,
@@ -18,11 +22,15 @@ function createScatter(data, varX, varY, plotID) {
   const xScale = d3
     .scaleLinear()
     .domain([
-      d3.min(data, (d) => parseFloat(d[varX])),
+      d3.min(data, (d) => {
+        return parseFloat(d[varX]);
+      }),
       d3.max(data, (d) => parseFloat(d[varX])),
     ]) // Data Range
     .range([0, dim.width]);
-  maxY = d3.max(data, (d) => parseFloat(d[varY]));
+  maxY = d3.max(data, (d) => {
+    return parseFloat(d[varY]);
+  });
   const yScale = d3
     .scaleLinear()
     .domain([d3.min(data, (d) => parseFloat(d[varY])), maxY])
@@ -36,7 +44,7 @@ function createScatter(data, varX, varY, plotID) {
     .call(xAxis);
   svg.append("g").call(yAxis);
   // Create circles for each data point
-  svg
+  var circ = svg
     .append("g")
     .selectAll("dot")
     .data(data)
@@ -49,7 +57,13 @@ function createScatter(data, varX, varY, plotID) {
       return yScale(parseFloat(d[varY]));
     })
     .attr("r", 4)
-    .style("fill", "black");
+    .style("fill", function (d) {
+      var key = d["StandardSh/90"] + "," + d["GoalieSave%"];
+      if (keys.has(key)) {
+        return "blue";
+      }
+      return "black";
+    });
 
   // Y axis label:
   svg
@@ -59,14 +73,14 @@ function createScatter(data, varX, varY, plotID) {
     .attr("y", -dim.left + 20)
     .attr("x", -dim.top - dim.height / 2 + 30)
     .text(varY)
-    .style("font-size", 12);
+    .style("font-size", "14px");
   svg
     .append("text")
     .attr("text-anchor", "middle")
     .attr("x", dim.width / 2)
     .attr("y", dim.height + dim.bottom - 20)
     .text(varX)
-    .style("font-size", 12);
+    .style("font-size", "14px");
 
   svg
     .append("text")
@@ -74,5 +88,5 @@ function createScatter(data, varX, varY, plotID) {
     .attr("x", dim.width / 2)
     .attr("y", -10)
     .text(varX + " vs. " + varY + " Scatter Plot")
-    .style("font-size", 14);
+    .style("font-size", "14px");
 }

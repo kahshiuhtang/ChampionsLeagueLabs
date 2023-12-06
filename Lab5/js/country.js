@@ -25,8 +25,8 @@ function createCountryStats(data) {
     return 0;
   });
   const dim = {
-    width: 740,
-    height: 740,
+    width: 540,
+    height: 480,
     mTop: 60,
     mBottom: 30,
     mLeft: 100,

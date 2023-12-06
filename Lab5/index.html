@@ -16,226 +16,119 @@
     <script type="text/javascript" src="js/wins.js"></script>
     <script type="text/javascript" src="js/country.js"></script>
     <script type="text/javascript" src="js/europe.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <link rel="stylesheet" href="styles.css" />
   <body>
     <div id="title">Champion's League Football Stats</div>
     <div id="main">  
-      <div id="control-panel">
-        <div class="cont">
-          <label class="header" for="variable">Graph Variable: </label>
-        </div>
-        <div id="select-div" class="cont">
-          <select name="selected-variable" id="variable-select">
-            <option value="Posession">Poessession</option>
-            <option value="GoalsAgainstPer90">GoalsAgainstPer90</option>
-            <option value="GoalieSave%">
-              GoalieSave%
-            </option>
-            <option value="TotalWins">TotalWins</option>
-            <option value="GoalieLaunchedComp%">
-              GoalieLaunchedComp%
-            </option>
-            <option value="GoaliePassesLaunch%">GoaliePassesLaunch%</option>
-            <option value="StandardSh/90">StandardSh/90</option>
-            <option value="StandardSoT/90">StandardSoT/90</option>
-            <option value="TotalPassCmp%">TotalPassCmp%</option>
-            <option value="ChallengesTkl%">ChallengesTkl%</option>
-            <option value="Take-OnsSucc%">
-              Take-OnsSucc%
-            </option>
-            <option value="TeamSuccess(xG)xG+/-90">TeamSuccess(xG)xG+/-90</option>
-          </select>
-          <div class="cont">
-            <button id="show-histogram" onclick="showStartHistogram()">Show Graph</button>
-          </div>
-      </div>  
-      <div id="starting-bar"></div>
       <div id="graphs">
         <div class="scatters">
           <div id="scatter1"></div>
-        <div id="scatter2"></div>
-        <div id="scatter3"></div>
+          <div id="scatter2"></div>
+          <div id="scatter3"></div>
+          <div id="country"></div>
         </div>
         <div class="scatters">
           <div id="wins"></div>
-          <div id="country"></div>
+          <div id="europe"></div>
           <div id="biplot"></div>
         </div>
       </div>
     </div>
     <script>
-      fetch("data/pca.csv").then((response) =>response.text()).then((data)=>{
+      var fullData = [];
+      var countryData = [];
+      var colored = new Set();
+      var currSet = new Set();
+      var country = new Set();
+      var countrySet = new Set();
+      var biplotData = new Set();
+      function biplotClick(indexSet){
+        console.log(indexSet);
+        var keys = new Set();
+        indexSet.forEach(function(d){
+          var o = fullData[d];
+          var key = o["StandardSh/90"] + "," + o["GoalieSave%"];
+          keys.add(key);
+        });
+        createScatter(fullData, "xGDiffPer90", "StandardSoT/90", "#scatter1", keys);
+        createScatter(fullData, "Posession", "GoalsAgainstPer90", "#scatter2", keys);
+        createScatter(fullData,  "GoalieLaunchedComp%", "TotalPassCmp%","#scatter3", keys);
+        
+      }
+      function handleCountryClick(id){
+        countrySet = new Set();
+        for(var i = 0; i < countryData.length; i++){
+          if(countryData[i].Squad.substring(0,2) == id){
+            countrySet.add(countryData[i]["StandardSh/90"] + "," + countryData[i]["GoalieSave%"])
+          }
+        }
+        createScatter(fullData, "xGDiffPer90", "StandardSoT/90", "#scatter1", countrySet);
+        createScatter(fullData, "Posession", "GoalsAgainstPer90", "#scatter2", countrySet);
+        createScatter(fullData,  "GoalieLaunchedComp%", "TotalPassCmp%","#scatter3", countrySet);
+        
+      }
+      function handleBarClick(bar, allBars, keys){
+        var minBar = d3.min(bar, function(d){
+          return d.Posession;
+        })
+        var minInd = 0;
+        for(var i = 0; i < allBars.length; i++){
+          var currMin = d3.min(allBars[i], function(d){
+          return d.Posession;
+          });
+          if(currMin == minBar){
+            minInd = i;
+          }
+        }
+        if(colored.has(minInd)){
+          colored.delete(minInd)
+          keys.forEach(function(val){
+            currSet.delete(val);
+          })
+          createScatter(fullData, "xGDiffPer90", "StandardSoT/90", "#scatter1", currSet);
+          createScatter(fullData, "Posession", "GoalsAgainstPer90", "#scatter2", currSet);
+          createScatter(fullData,  "GoalieLaunchedComp%", "TotalPassCmp%","#scatter3", currSet);
+        
+          return true;
+        }else{
+          colored.add(minInd);
+          keys.forEach(function(val){
+            currSet.add(val);
+          })
+          createScatter(fullData, "xGDiffPer90", "StandardSoT/90", "#scatter1", currSet);
+          createScatter(fullData, "Posession", "GoalsAgainstPer90", "#scatter2", currSet);
+          createScatter(fullData,  "GoalieLaunchedComp%", "TotalPassCmp%","#scatter3", currSet);
+          return false;
+        }
+      }
+       fetch("data/pca.csv").then((response) =>response.text()).then((data)=>{
         var  d = parseCSVForPCA(data);
         fetch("data/biplot.csv")
         .then((response) => response.text())
         .then((data1) => {
           var  d1 = parseCSVForBiplot(data1);
-          graphBiplot(d, d1);
+          graphBiplot(d, d1, biplotClick);
         });
       })
-    </script>
-    <script>
-      var biplot_data;
-      var pca_data;
-      var mds_data;
-      var pcd_data;
-      var cluster_data = [];
-      fetch("data/pca.csv").then((response) =>response.text()).then((data)=>{
-        pca_data = parseCSVForPCA(data);
-        fetch("data/biplot.csv")
-        .then((response) => response.text())
-        .then((data1) => {
-          biplot_data = parseCSVForBiplot(data1);
-        });
-      })
-      fetch("data/mds_eucl.csv")
-        .then((response) => response.text())
-        .then((data) => {
-          mds_data = parseCSVForMDS(data);
-        });
-      fetch("data/pcd_data.csv")
-      .then((response) => response.text())
-      .then((data) => {
-        pcd_data= parseCSVForPCD(data);
-      });
-      for(var i = 0; i < 384; i++){
-            cluster_data.push(0);
-      }
-      function handleChoose(cluster_update){
-        document.getElementById("pcd").style.display = "block";
-        document.getElementById("mds").style.display = "block";
-        document.getElementById("biplot").style.display = "block";
-
-        document.getElementById("pcd").innerHTML = "";
-        document.getElementById("mds").innerHTML = "";
-        document.getElementById("biplot").innerHTML = "";
-        if(cluster_update != null){
-          cluster_data = cluster_update;
-        }
-        console.log(cluster_data)
-        graphBiplot(pca_data, biplot_data, cluster_data);
-        plotMDSEucl(mds_data, cluster_data);
-        plotPCD(pcd_data, cluster_data);
-      }
-    </script>
-    <script>
-      var biplot_data;
-      var pca_data;
-      var mds_data;
-      var pcd_data;
-      var current_cluster_status;
-      fetch("data/mds_eucl.csv")
-        .then((response) => response.text())
-        .then((data) => {
-          mds_data = parseCSVForMDS(data);
-        });
-      fetch("data/pcd_data.csv")
-      .then((response) => response.text())
-      .then((data) => {
-        pcd_data= parseCSVForPCD(data);
-      });
-      fetch("data/clusters.csv")
-      .then((response) => response.text())
-      .then((data) => {
-        current_cluster_status = parseCluster(data);
-      });
-      function handlePreClusteredData(){
-        document.getElementById("pcd").style.display = "block";
-        document.getElementById("mds").style.display = "block";
-        document.getElementById("biplot").style.display = "block";
-
-        document.getElementById("starting-bar").innerHTML = "";
-        document.getElementById("pcd").innerHTML = "";
-        document.getElementById("mds").innerHTML = "";
-        document.getElementById("biplot").innerHTML = "";
-        graphBiplot(pca_data, biplot_data, current_cluster_status);
-        plotMDSEucl(mds_data, current_cluster_status);
-        plotPCD(pcd_data, current_cluster_status);
-      }
-    </script>
-    <script>
       fetch("data/data.csv")
       .then((response) => response.text())
       .then((data) => {
         var data0 = parseFullData(data);
-        createWinsHist(data0)
+        fullData = data0;
+        createWinsHist(data0, handleBarClick)
         var data1 = parseFullDataForCountry(data);
+        countryData= data1;
         createCountryStats(data1);
-        createScatter(data0, "Posession", "StandardSoT/90", "#scatter1");
+        console.log(data0)
+        createScatter(data0, "xGDiffPer90", "StandardSoT/90", "#scatter1");
         createScatter(data0, "Posession", "GoalsAgainstPer90", "#scatter2");
-        createScatter(data0,  "Posession", "TotalPassCmp%","#scatter3");
+        createScatter(data0,  "GoalieLaunchedComp%", "TotalPassCmp%","#scatter3");
         
         fetch("data/custom.geo.json").then((response) =>response.text()).then((d)=>{
-          drawEurope(data1, d);
+          drawEurope(data1, d, handleCountryClick);
         })
       });
-    </script>
-    <script>
-      var parsedData;
-      var map = {};
-      var usedIndexes = new Set();
-      function clearOutClustering(){
-        map = {};
-        usedIndexes = new Set();
-        var ans = [];
-        for(var i = 0; i < parsedData.length; i++){
-          parsedData[i].cluster = 0;
-          ans.push(parsedData[i].cluster)
-        }
-        handleChoose(ans);
-      }
-      function handleBarClick(min, max){
-        var field = document.getElementById("variable-select").value;
-        var reset = false;
-        var removeThisIndex = -1;
-        if((min + "," + max) in map){
-          reset = true;
-          usedIndexes.delete(map[min + "," + max]);
-        }
-        var ans = [];
-        var nextFreeIndex = - 1;
-        for(var i = 1; ;i++){
-          if(usedIndexes.has(i) == false){
-            nextFreeIndex = i;
-            break;
-          }
-        }
-        for(var i = 0; i < parsedData.length; i++){
-          if(parsedData[i][field] <= max && parsedData[i][field] >= min){
-            if(reset == false){
-              parsedData[i].cluster = nextFreeIndex;
-            }else{
-              parsedData[i].cluster = 0;
-            }
-          }
-          ans.push(parsedData[i].cluster)
-        }
-        if(reset == true){
-          delete map[min + "," + max];
-        }else{
-          map[min + "," + max] = nextFreeIndex; 
-          usedIndexes.add(nextFreeIndex);
-        }
-        var colors = ["#001219", "#94d2bd", "#e9d8a6", "#ee9b00", "#e56b6f", "#57cc99", "#967aa1", "#4393c3", "#2166ac", "#54AD56"]
-        handleChoose(ans)
-        return reset == true ? "#0c1821" : colors[nextFreeIndex];
-      }
-      function showStartHistogram(){
-        fetch("data/data.csv")
-        .then((response) => response.text())
-        .then((csvData) => {
-          parsedData = parseBasicCSV(csvData);
-          clearOutClustering();
-          createMainHistogram(parseBasicCSV(csvData), handleBarClick)
-          for(var i = 0; i < parsedData.length ; i++){
-            parsedData[i].cluster = 0;
-          }
-        })
-        .catch((error) => {
-          console.error("Error preloading the CSV file:", error);
-        });
-      }
-
     </script>
   </body>
 </html>

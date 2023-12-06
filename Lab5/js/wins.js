@@ -49,10 +49,10 @@ function parseFullDataForCountry(csvString) {
   return data;
 }
 
-function createWinsHist(data) {
+function createWinsHist(data, clickHandler) {
   const dim = {
-    width: 740,
-    height: 740,
+    width: 640,
+    height: 540,
     mTop: 60,
     mBottom: 30,
     mLeft: 20,
@@ -112,7 +112,19 @@ function createWinsHist(data) {
     .attr("height", function (d) {
       return dim.height - y(d.length);
     })
-    .style("fill", "#69b3a2");
+    .style("fill", "#69b3a2")
+    .on("click", function (d) {
+      var s = new Set();
+      for (var i = 0; i < d.length; i++) {
+        s.add(d[i]["StandardSh/90"] + "," + d[i]["GoalieSave%"]);
+      }
+      var clicked = clickHandler(d, bins, s);
+      if (clicked == true) {
+        d3.select(this).style("fill", "gold");
+      } else {
+        d3.select(this).style("fill", "black");
+      }
+    });
 }
 
 function convertToLong(ab) {

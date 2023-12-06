@@ -12,7 +12,7 @@ function parseCSVForBiplot(csvString) {
   }
   return points;
 }
-function graphBiplot(data, lineData) {
+function graphBiplot(data, lineData, handleClick) {
   console.log(data);
   console.log(lineData);
   const dim = {
@@ -49,7 +49,7 @@ function graphBiplot(data, lineData) {
       return yScale(parseFloat(d.y));
     })
     .attr("r", 3)
-    .style("fill", "#000080");
+    .style("fill", "black");
   var x_label = "PC1";
   var y_label = "PC2";
   svg
@@ -145,9 +145,20 @@ function graphBiplot(data, lineData) {
   // Function that is triggered when brushing is performed
   function updateChart() {
     extent = d3.event.selection;
+    var xyIDS = new Set();
     cir.classed("selected", function (d) {
-      return isBrushed(extent, x(d.x), y(d.y));
+      if (isBrushed(extent, xScale(d.x), yScale(d.y)) == true) {
+        xyIDS.add(d.x + "," + d.y);
+      }
+      return isBrushed(extent, xScale(d.x), yScale(d.y));
     });
+    var realIDs = new Set();
+    for (var i = 0; i < data.length; i++) {
+      if (xyIDS.has(data[i].x + "," + data[i].y)) {
+        realIDs.add(i);
+      }
+    }
+    handleClick(realIDs);
   }
 
   // A function that return TRUE or FALSE according if a dot is in the selection or not

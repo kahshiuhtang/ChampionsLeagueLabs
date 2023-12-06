@@ -140,3 +140,6 @@ button {
 .country_selector {
   display: inline-block;
 }
+#title {
+  height: 3%;
+}
