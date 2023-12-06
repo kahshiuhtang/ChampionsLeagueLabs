@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <script src="https://unpkg.com/topojson@3"></script>
     <script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
     <script type="text/javascript" src="js/correlation.js"></script>
     <script type="text/javascript" src="js/pcd.js"></script>
@@ -12,21 +13,13 @@
     <script type="text/javascript" src="js/site.js"></script>
     <script type="text/javascript" src="js/helper.js"></script>
     <script type="text/javascript" src="js/default_cluster.js"></script>
+    <script type="text/javascript" src="js/wins.js"></script>
+    <script type="text/javascript" src="js/country.js"></script>
+    <script type="text/javascript" src="js/europe.js"></script>
     <link rel="stylesheet" href="styles.css" />
   <body>
-    <div>
-      <input id="color-map" value=""/>
-    </div>
     <div id="title">Champion's League Football Stats</div>
-    <div id="main">
-      <div id="page-choose">
-        <button id="choose-clusters-but" onclick="handleChoose()">
-          Choose Clusters
-        </button>
-        <button id="default-clusters-but" onclick="handlePreClusteredData()">
-          View K-Means Clustered Data
-        </button>
-      </div>
+    <div id="main">  
       <div id="control-panel">
         <div class="cont">
           <label class="header" for="variable">Graph Variable: </label>
@@ -58,13 +51,29 @@
       </div>  
       <div id="starting-bar"></div>
       <div id="graphs">
-      <div class="graph" id="pcd"></div>
-      <div id="mds-biplot-display">
-        <div class="graph" id="mds"></div>
-        <div class="graph" id="biplot"></div>
+        <div class="scatters">
+          <div id="scatter1"></div>
+        <div id="scatter2"></div>
+        <div id="scatter3"></div>
+        </div>
+        <div class="scatters">
+          <div id="wins"></div>
+          <div id="country"></div>
+          <div id="biplot"></div>
+        </div>
       </div>
     </div>
-    </div>
+    <script>
+      fetch("data/pca.csv").then((response) =>response.text()).then((data)=>{
+        var  d = parseCSVForPCA(data);
+        fetch("data/biplot.csv")
+        .then((response) => response.text())
+        .then((data1) => {
+          var  d1 = parseCSVForBiplot(data1);
+          graphBiplot(d, d1);
+        });
+      })
+    </script>
     <script>
       var biplot_data;
       var pca_data;
@@ -115,14 +124,6 @@
       var mds_data;
       var pcd_data;
       var current_cluster_status;
-      fetch("data/pca.csv").then((response) =>response.text()).then((data)=>{
-        pca_data = parseCSVForPCA(data);
-        fetch("data/biplot.csv")
-        .then((response) => response.text())
-        .then((data1) => {
-          biplot_data = parseCSVForBiplot(data1);
-        });
-      })
       fetch("data/mds_eucl.csv")
         .then((response) => response.text())
         .then((data) => {
@@ -151,6 +152,23 @@
         plotMDSEucl(mds_data, current_cluster_status);
         plotPCD(pcd_data, current_cluster_status);
       }
+    </script>
+    <script>
+      fetch("data/data.csv")
+      .then((response) => response.text())
+      .then((data) => {
+        var data0 = parseFullData(data);
+        createWinsHist(data0)
+        var data1 = parseFullDataForCountry(data);
+        createCountryStats(data1);
+        createScatter(data0, "Posession", "StandardSoT/90", "#scatter1");
+        createScatter(data0, "Posession", "GoalsAgainstPer90", "#scatter2");
+        createScatter(data0,  "Posession", "TotalPassCmp%","#scatter3");
+        
+        fetch("data/custom.geo.json").then((response) =>response.text()).then((d)=>{
+          drawEurope(data1, d);
+        })
+      });
     </script>
     <script>
       var parsedData;

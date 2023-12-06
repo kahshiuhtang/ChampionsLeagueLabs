@@ -10,15 +10,16 @@ function parseCSVForBiplot(csvString) {
     };
     points.push(temp);
   }
-  console.log(points);
   return points;
 }
-function graphBiplot(data, lineData, cluster_data) {
+function graphBiplot(data, lineData) {
+  console.log(data);
+  console.log(lineData);
   const dim = {
-    width: 800 - 80 - 150,
+    width: 540 - 80 - 40,
     height: 540 - 60 - 30,
     top: 60,
-    right: 150,
+    right: 40,
     bottom: 30,
     left: 80,
   };
@@ -35,28 +36,20 @@ function graphBiplot(data, lineData, cluster_data) {
 
   const xAxis = d3.axisBottom(xScale);
   const yAxis = d3.axisLeft(yScale);
-  for(var i = 0; i < data.length; i++){
-    data[i]["cluster"] = cluster_data[i];
-  }
-  
-  var colors = ["#001219", "#94d2bd", "#e9d8a6", "#ee9b00", "#e56b6f", "#57cc99", "#967aa1", "#4393c3", "#2166ac", "#54AD56"]
-    
-  svg
+  var cir = svg
     .append("g")
     .selectAll("dot")
     .data(data)
     .enter()
     .append("circle")
-    .style("fill", function(d){
-      return colors[d["cluster"]];
-    }).attr("cx", function (d) {
+    .attr("cx", function (d) {
       return xScale(parseFloat(d.x));
     })
     .attr("cy", function (d) {
       return yScale(parseFloat(d.y));
     })
     .attr("r", 3)
-    ;
+    .style("fill", "#000080");
   var x_label = "PC1";
   var y_label = "PC2";
   svg
@@ -75,7 +68,7 @@ function graphBiplot(data, lineData, cluster_data) {
     .attr("x", -yScale(0))
     .text(y_label)
     .style("font-size", 12)
-    .style("font-weight", "bold").style("fill", "white");
+    .style("font-weight", "bold");
   svg
     .append("text")
     .attr("text-anchor", "middle")
@@ -83,7 +76,7 @@ function graphBiplot(data, lineData, cluster_data) {
     .attr("y", dim.height + dim.bottom)
     .text(x_label)
     .style("font-size", 12)
-    .style("font-weight", "bold").style("fill", "white");
+    .style("font-weight", "bold");
 
   svg
     .append("text")
@@ -92,7 +85,7 @@ function graphBiplot(data, lineData, cluster_data) {
     .attr("y", -10)
     .text("Biplot with PC1 and PC2")
     .style("font-size", "20px")
-    .style("font-weight", "bold").style("fill", "white");;
+    .style("font-weight", "bold");
   lineData.forEach(function (line) {
     svg
       .append("line")
@@ -102,40 +95,35 @@ function graphBiplot(data, lineData, cluster_data) {
       .attr("y1", yScale(0))
       .attr("x2", xScale(line.x))
       .attr("y2", yScale(line.y));
-
     svg
       .append("text")
       .attr("x", function () {
-        if(line.name =="GoalsAgainstPer90"){
+        if (line.name == "GoalsAgainstPer90") {
           return xScale(line.x) - 100;
-        }else if(line.name =="TotalWins"){
+        } else if (line.name == "TotalWins") {
           return xScale(line.x) + 100;
-        }else if(line.name =="Posession"){
-
-        }else if(line.name =="GoaliePassesLaunch%"){
+        } else if (line.name == "Posession") {
+        } else if (line.name == "GoaliePassesLaunch%") {
           return xScale(line.x) - 100;
-        }else if(line.name =="StandardSh/90"){
+        } else if (line.name == "StandardSh/90") {
           return xScale(line.x) + 40;
-        }else if(line.name =="GoalsAgainstPer90"){
-
+        } else if (line.name == "GoalsAgainstPer90") {
         }
         return xScale(line.x);
       })
       .attr("y", function () {
         if (line.name == "TotalPassCmp%") {
           return yScale(line.y) - 13;
-        }else if(line.name =="StandardSh/90"){
+        } else if (line.name == "StandardSh/90") {
           return yScale(line.y) + 17;
-        }else if(line.name == "TeamSuccess(xG)xG+/-90"){
-          return yScale(line.y) + 10
-        }
-        else if(line.name == "StandardSoT/90"){
-          return yScale(line.y) + 17
-        }
-        else if(line.name == "Posession"){
-          return yScale(line.y) - 4
-        }else if(line.name == "GoalieSave%"){
-          return yScale(line.y) + 9
+        } else if (line.name == "TeamSuccess(xG)xG+/-90") {
+          return yScale(line.y) + 10;
+        } else if (line.name == "StandardSoT/90") {
+          return yScale(line.y) + 17;
+        } else if (line.name == "Posession") {
+          return yScale(line.y) - 4;
+        } else if (line.name == "GoalieSave%") {
+          return yScale(line.y) + 9;
         }
         return yScale(line.y);
       })
@@ -144,4 +132,30 @@ function graphBiplot(data, lineData, cluster_data) {
       .style("font-size", "12px")
       .style("font-weight", "bold");
   });
+  svg.call(
+    d3
+      .brush() // Add the brush feature using the d3.brush function
+      .extent([
+        [0, 0],
+        [dim.width, dim.height],
+      ]) // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
+      .on("start brush", updateChart) // Each time the brush selection changes, trigger the 'updateChart' function
+  );
+
+  // Function that is triggered when brushing is performed
+  function updateChart() {
+    extent = d3.event.selection;
+    cir.classed("selected", function (d) {
+      return isBrushed(extent, x(d.x), y(d.y));
+    });
+  }
+
+  // A function that return TRUE or FALSE according if a dot is in the selection or not
+  function isBrushed(brush_coords, cx, cy) {
+    var x0 = brush_coords[0][0],
+      x1 = brush_coords[1][0],
+      y0 = brush_coords[0][1],
+      y1 = brush_coords[1][1];
+    return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1; // This return TRUE or FALSE depending on if the points is in the selected area
+  }
 }

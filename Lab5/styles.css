@@ -1,5 +1,5 @@
 body {
-  height: 160vh;
+  height: 200vh;
   padding: 0;
   margin: 0;
 }
@@ -124,4 +124,19 @@ button {
   opacity: 1 !important;
   stroke: blue;
   stroke-width: 1px;
+}
+#country {
+  padding-left: 2rem;
+}
+.scatters {
+  display: flex;
+}
+.scatters > * {
+  display: inline-block;
+}
+.country_selector {
+  display: flex;
+}
+.country_selector {
+  display: inline-block;
 }
