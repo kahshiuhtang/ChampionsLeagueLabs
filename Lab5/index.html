@@ -26,25 +26,28 @@
           <div id="scatter1"></div>
           <div id="scatter2"></div>
           <div id="scatter3"></div>
-          <div id="country"></div>
+          <div id="pcd"></div>
         </div>
         <div class="scatters">
           <div id="wins"></div>
           <div id="europe"></div>
           <div id="biplot"></div>
+          <div id="mds"></div>
         </div>
       </div>
     </div>
     <script>
       var fullData = [];
       var countryData = [];
+      var mdsData = [];
       var colored = new Set();
       var currSet = new Set();
       var country = new Set();
       var countrySet = new Set();
       var biplotData = new Set();
+      var mdsKeys = new Set();
+      var pcd_data = new Set();
       function biplotClick(indexSet){
-        console.log(indexSet);
         var keys = new Set();
         indexSet.forEach(function(d){
           var o = fullData[d];
@@ -54,6 +57,8 @@
         createScatter(fullData, "xGDiffPer90", "StandardSoT/90", "#scatter1", keys);
         createScatter(fullData, "Posession", "GoalsAgainstPer90", "#scatter2", keys);
         createScatter(fullData,  "GoalieLaunchedComp%", "TotalPassCmp%","#scatter3", keys);
+        plotMDSEucl(mdsData, keys, fullData);
+        plotPCD(pcd_data, keys);
         
       }
       function handleCountryClick(id){
@@ -66,7 +71,8 @@
         createScatter(fullData, "xGDiffPer90", "StandardSoT/90", "#scatter1", countrySet);
         createScatter(fullData, "Posession", "GoalsAgainstPer90", "#scatter2", countrySet);
         createScatter(fullData,  "GoalieLaunchedComp%", "TotalPassCmp%","#scatter3", countrySet);
-        
+        plotMDSEucl(mdsData, countrySet, fullData);
+        plotPCD(pcd_data, countrySet);
       }
       function handleBarClick(bar, allBars, keys){
         var minBar = d3.min(bar, function(d){
@@ -89,7 +95,8 @@
           createScatter(fullData, "xGDiffPer90", "StandardSoT/90", "#scatter1", currSet);
           createScatter(fullData, "Posession", "GoalsAgainstPer90", "#scatter2", currSet);
           createScatter(fullData,  "GoalieLaunchedComp%", "TotalPassCmp%","#scatter3", currSet);
-        
+          plotMDSEucl(mdsData, currSet, fullData);
+          plotPCD(pcd_data, currSet);
           return true;
         }else{
           colored.add(minInd);
@@ -99,6 +106,8 @@
           createScatter(fullData, "xGDiffPer90", "StandardSoT/90", "#scatter1", currSet);
           createScatter(fullData, "Posession", "GoalsAgainstPer90", "#scatter2", currSet);
           createScatter(fullData,  "GoalieLaunchedComp%", "TotalPassCmp%","#scatter3", currSet);
+          plotMDSEucl(mdsData, currSet, fullData);
+          plotPCD(pcd_data, currSet);
           return false;
         }
       }
@@ -111,6 +120,12 @@
           graphBiplot(d, d1, biplotClick);
         });
       })
+      fetch("data/pcd_data.csv")
+      .then((response) => response.text())
+      .then((data) => {
+        pcd_data= parseCSVForPCD(data);
+        plotPCD(pcd_data, new Set());
+      });
       fetch("data/data.csv")
       .then((response) => response.text())
       .then((data) => {
@@ -124,10 +139,16 @@
         createScatter(data0, "xGDiffPer90", "StandardSoT/90", "#scatter1");
         createScatter(data0, "Posession", "GoalsAgainstPer90", "#scatter2");
         createScatter(data0,  "GoalieLaunchedComp%", "TotalPassCmp%","#scatter3");
-        
         fetch("data/custom.geo.json").then((response) =>response.text()).then((d)=>{
           drawEurope(data1, d, handleCountryClick);
         })
+         fetch("data/mds_eucl.csv")
+        .then((response) => response.text())
+        .then((data) => {
+          var d = parseCSVForMDS(data);
+          mdsData = d;
+          plotMDSEucl(d, mdsKeys, fullData);
+        });
       });
     </script>
   </body>

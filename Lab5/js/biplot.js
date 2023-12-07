@@ -13,11 +13,9 @@ function parseCSVForBiplot(csvString) {
   return points;
 }
 function graphBiplot(data, lineData, handleClick) {
-  console.log(data);
-  console.log(lineData);
   const dim = {
-    width: 540 - 80 - 40,
-    height: 540 - 60 - 30,
+    width: 440 - 80 - 40,
+    height: 440 - 60 - 30,
     top: 60,
     right: 40,
     bottom: 30,
@@ -49,7 +47,7 @@ function graphBiplot(data, lineData, handleClick) {
       return yScale(parseFloat(d.y));
     })
     .attr("r", 3)
-    .style("fill", "black");
+    .style("fill", "#d0c8d6");
   var x_label = "PC1";
   var y_label = "PC2";
   svg

@@ -28,8 +28,8 @@ function groupByCountry(data) {
 
 function drawEurope(fullData, geoData, handleClick) {
   // Setting up the svg element for D3 to draw in
-  let width = 800,
-    height = 600;
+  let width = 480,
+    height = 480;
   var parsedData = groupByCountry(fullData);
   let svg = d3
     .select("#europe")
@@ -41,6 +41,14 @@ function drawEurope(fullData, geoData, handleClick) {
     .center([15, 56])
     .scale([width / 1.5])
     .translate([width / 2, height / 2]);
+  svg
+    .append("text")
+    .attr("text-anchor", "middle")
+    .attr("x", width / 2)
+    .attr("y", 40)
+    .text("European Country Total League Wins")
+    .style("font-size", "14px")
+    .style("fill", "white");
 
   // The path generator uses the projection to convert the GeoJSON
   // geometry to a set of coordinates that D3 can understand
@@ -69,13 +77,47 @@ function drawEurope(fullData, geoData, handleClick) {
         }),
       ])
       .range(["#73c2fb", "#002366"]);
+    var aS = d3
+      .scaleLinear()
+      .range([42, height - 56])
+      .domain([
+        1,
+        d3.max(parsedData, function (d) {
+          return d.count;
+        }),
+      ]);
+
+    var yAxis = d3.axisRight().scale(aS).tickPadding(10);
+
+    var aG = svg
+      .append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+      .attr("transform", "translate(" + (width - 50) + " ,0)");
+
+    var r = d3.range(
+      1,
+      d3.max(parsedData, function (d) {
+        return d.count;
+      }),
+      0.5
+    );
+    var h = height / r.length + 3;
+    r.forEach(function (d) {
+      aG.append("rect")
+        .style("fill", colorRange(d))
+        .attr("height", h)
+        .attr("width", 10)
+        .attr("x", 0)
+        .attr("y", aS(d));
+    });
     svg
       .selectAll("path")
       .data(geojson.features)
       .enter()
       .append("path")
-      .attr("d", pathGenerator) // This is where the magic happens
-      .attr("stroke", "black") // Color of the lines themselves
+      .attr("d", pathGenerator)
+      .attr("stroke", "#e7e3ea")
       .attr("fill", function (d) {
         var name = d.properties.name;
         var short = convertToShort(name);
@@ -85,9 +127,18 @@ function drawEurope(fullData, geoData, handleClick) {
         return "white";
       })
       .on("click", function (d) {
-        console.log(d.properties.name);
         var short = convertToShort(d.properties.name);
         handleClick(short);
+        svg.select("#country-select-name").remove();
+        svg
+          .append("text")
+          .attr("text-anchor", "middle")
+          .attr("id", "country-select-name")
+          .attr("x", width / 2)
+          .attr("y", height - 40)
+          .text("Selected Country: " + d.properties.name)
+          .style("font-size", "14px")
+          .style("fill", "white");
       }); // Color uses to fill in the lines
   });
 }

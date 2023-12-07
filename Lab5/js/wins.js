@@ -51,11 +51,11 @@ function parseFullDataForCountry(csvString) {
 
 function createWinsHist(data, clickHandler) {
   const dim = {
-    width: 640,
-    height: 540,
+    width: 340,
+    height: 340,
     mTop: 60,
-    mBottom: 30,
-    mLeft: 20,
+    mBottom: 40,
+    mLeft: 70,
     mRight: 20,
   };
   var svg = d3
@@ -112,7 +112,7 @@ function createWinsHist(data, clickHandler) {
     .attr("height", function (d) {
       return dim.height - y(d.length);
     })
-    .style("fill", "#69b3a2")
+    .style("fill", "#d0c8d6")
     .on("click", function (d) {
       var s = new Set();
       for (var i = 0; i < d.length; i++) {
@@ -120,11 +120,36 @@ function createWinsHist(data, clickHandler) {
       }
       var clicked = clickHandler(d, bins, s);
       if (clicked == true) {
-        d3.select(this).style("fill", "gold");
+        d3.select(this).style("fill", "#d0c8d6");
       } else {
-        d3.select(this).style("fill", "black");
+        d3.select(this).style("fill", "#a64d79");
       }
     });
+  svg
+    .append("text")
+    .attr("text-anchor", "middle")
+    .attr("transform", "rotate(-90)")
+    .attr("y", -dim.mLeft + 20)
+    .attr("x", -dim.mTop - dim.height / 2 + 30)
+    .text("Count (# Teams)")
+    .style("font-size", "14px")
+    .style("fill", "white");
+  svg
+    .append("text")
+    .attr("text-anchor", "middle")
+    .attr("x", dim.width / 2)
+    .attr("y", dim.height + dim.mBottom - 5)
+    .text("Wins")
+    .style("font-size", "14px")
+    .style("fill", "white");
+  svg
+    .append("text")
+    .attr("text-anchor", "middle")
+    .attr("x", dim.width / 2)
+    .attr("y", -5)
+    .text("Wins Histogram (Teams)")
+    .style("font-size", "14px")
+    .style("fill", "white");
 }
 
 function convertToLong(ab) {

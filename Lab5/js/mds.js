@@ -17,23 +17,20 @@ function parseCSVForMDS(csvString) {
   }
   return result;
 }
-function plotMDSEucl(data, cluster_data) {
-  createScatterMDSEucl(data, cluster_data);
+function plotMDSEucl(data, cluster_data, fullData) {
+  createScatterMDSEucl(data, cluster_data, fullData);
 }
 
-function createScatterMDSEucl(data, cluster_data) {
+function createScatterMDSEucl(data, rKeys, fullData) {
+  $("#mds").html("");
   const dim = {
-    width: 540 - 80 - 40,
-    height: 540 - 60 - 30,
+    width: 380 - 80 - 40,
+    height: 380 - 60 - 30,
     top: 60,
     right: 40,
     bottom: 30,
     left: 80,
   };
-  for (var i = 0; i < data.length; i++) {
-    data[i]["cluster"] = cluster_data[i];
-  }
-
   var colors = [
     "#001219",
     "#94d2bd",
@@ -71,6 +68,13 @@ function createScatterMDSEucl(data, cluster_data) {
 
   const xAxis = d3.axisBottom(xScale);
   const yAxis = d3.axisLeft(yScale);
+  var keys = new Set();
+  for (var i = 0; i < fullData.length; i++) {
+    var key = fullData[i]["StandardSh/90"] + "," + fullData[i]["GoalieSave%"];
+    if (rKeys.has(key)) {
+      keys.add(i);
+    }
+  }
   var circles = svg
     .append("g")
     .selectAll("dot")
@@ -78,7 +82,10 @@ function createScatterMDSEucl(data, cluster_data) {
     .enter()
     .append("circle")
     .style("fill", function (d, i) {
-      return colors[d.cluster];
+      if (keys.has(i)) {
+        return "#a64d79";
+      }
+      return "#d0c8d6";
     })
     .attr("cx", function (d) {
       return xScale(parseFloat(d.x));
@@ -86,8 +93,7 @@ function createScatterMDSEucl(data, cluster_data) {
     .attr("cy", function (d) {
       return yScale(parseFloat(d.y));
     })
-    .attr("r", 4)
-    .style("opacity", 0.5);
+    .attr("r", 4);
   svg
     .append("g")
     .attr("transform", "translate(0," + yScale(0) + ")")
@@ -106,7 +112,7 @@ function createScatterMDSEucl(data, cluster_data) {
     .attr("y", -dim.left + 20)
     .attr("x", -dim.top - dim.height / 2 + 60)
     .text(y_label)
-    .style("font-size", 12)
+    .style("font-size", "12px")
     .style("font-weight", "bold")
     .style("fill", "white");
   svg
@@ -115,7 +121,7 @@ function createScatterMDSEucl(data, cluster_data) {
     .attr("x", xScale(0))
     .attr("y", dim.height + dim.bottom)
     .text(x_label)
-    .style("font-size", 12)
+    .style("font-size", "12px")
     .style("font-weight", "bold")
     .style("fill", "white");
 
@@ -125,33 +131,7 @@ function createScatterMDSEucl(data, cluster_data) {
     .attr("x", dim.width / 2)
     .attr("y", -10)
     .text("MDS Data Scatter")
-    .style("font-size", 14)
+    .style("font-size", "14px")
     .style("font-weight", "bold")
     .style("fill", "white");
-  svg.call(
-    d3
-      .brush()
-      .extent([
-        [0, 0],
-        [dim.width, dim.height],
-      ])
-      .on("start brush", updateChart)
-  );
-
-  // Function that is triggered when brushing is performed
-  function updateChart() {
-    extent = d3.event.selection;
-    circles.classed("selected", function (d) {
-      return isBrushed(extent, x(parseFloat(d.x)), y(parseFloat(d.y)));
-    });
-  }
-
-  // A function that return TRUE or FALSE according if a dot is in the selection or not
-  function isBrushed(brush_coords, cx, cy) {
-    var x0 = brush_coords[0][0],
-      x1 = brush_coords[1][0],
-      y0 = brush_coords[0][1],
-      y1 = brush_coords[1][1];
-    return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1; // This return TRUE or FALSE depending on if the points is in the selected area
-  }
 }

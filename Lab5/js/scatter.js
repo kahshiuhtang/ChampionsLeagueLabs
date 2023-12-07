@@ -4,10 +4,10 @@ function createScatter(data, varX, varY, plotID, keys) {
   }
   $(plotID).html("");
   const dim = {
-    width: 540 - 80 - 40,
-    height: 540 - 60 - 30,
+    width: 380 - 80 - 40,
+    height: 380 - 60 - 30,
     top: 60,
-    right: 40,
+    right: 20,
     bottom: 70,
     left: 80,
   };
@@ -60,9 +60,9 @@ function createScatter(data, varX, varY, plotID, keys) {
     .style("fill", function (d) {
       var key = d["StandardSh/90"] + "," + d["GoalieSave%"];
       if (keys.has(key)) {
-        return "blue";
+        return "#a64d79";
       }
-      return "black";
+      return "#d0c8d6";
     });
 
   // Y axis label:
@@ -73,20 +73,23 @@ function createScatter(data, varX, varY, plotID, keys) {
     .attr("y", -dim.left + 20)
     .attr("x", -dim.top - dim.height / 2 + 30)
     .text(varY)
-    .style("font-size", "14px");
+    .style("font-size", "14px")
+    .style("fill", "white");
   svg
     .append("text")
     .attr("text-anchor", "middle")
     .attr("x", dim.width / 2)
     .attr("y", dim.height + dim.bottom - 20)
     .text(varX)
-    .style("font-size", "14px");
-
+    .style("font-size", "14px")
+    .style("fill", "white");
+  if (varX === "GoalieLaunchedComp%") [(varX = "GLaunchComp%")];
   svg
     .append("text")
     .attr("text-anchor", "middle")
     .attr("x", dim.width / 2)
     .attr("y", -10)
-    .text(varX + " vs. " + varY + " Scatter Plot")
-    .style("font-size", "14px");
+    .text(varX + " vs. " + varY)
+    .style("font-size", "14px")
+    .style("fill", "white");
 }
